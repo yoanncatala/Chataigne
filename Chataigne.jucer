@@ -5,7 +5,7 @@
               companyWebsite="http://benjamin.kuperberg.fr/chataigne" companyEmail="benjamin@kuperberg.fr"
               defines="VST_LOGGING=0" splashScreenColour="Dark" cppLanguageStandard="17"
               companyCopyright="Ben Kuper" headerPath="../../Source&#10;../../External/wiiuse&#10;../../External/asio&#10;../../External/asiodriver&#10;../../External/kinect/include&#10;../../External/joycon/include&#10;../../External/servus/include&#10;../../External/dnssd/include&#10;../../External/ois/include&#10;../../External/sdl/include&#10;../../External/hidapi/include&#10;../../External/abletonlink/include&#10;../../External/libusb/include/libusb-1.0&#10;../../External/mosquitto/include&#10;../../External/posistagenet/include&#10;../../External/simpleble/include"
-              projectLineFeed="&#10;" jucerFormatVersion="1">
+              projectLineFeed="&#10;" jucerFormatVersion="1" displaySplashScreen="1">
   <MAINGROUP id="EDDVhd" name="Chataigne">
     <GROUP id="{E61F6705-4C4B-3F04-F742-20CC91F590E4}" name="Resources">
       <FILE id="J10iXd" name="process.png" compile="0" resource="1" file="Resources/process.png"/>
@@ -1696,7 +1696,7 @@
     </GROUP>
   </MAINGROUP>
   <EXPORTFORMATS>
-    <VS2022 targetFolder="Builds/VisualStudio2022" extraDefs="USE_KINECT=1&#10;USE_ABLETONLINK=1&#10;LINK_PLATFORM_WINDOWS=1&#10;BLE_SUPPORT=0"
+    <VS2022 targetFolder="Builds/VisualStudio2022" extraDefs="USE_KINECT=1&#10;USE_ABLETONLINK=1&#10;LINK_PLATFORM_WINDOWS=1&#10;BLE_SUPPORT=1"
             extraLinkerFlags="/HEAP:0x200000,0x10000" externalLibraries="hid.lib&#10;Kinect20.lib&#10;JoyShockLibrary.lib&#10;Servus.lib&#10;dnssd.lib&#10;SDL2.lib&#10;iphlpapi.lib&#10;hid.lib&#10;hidapi_static.lib&#10;mosquitto.lib&#10;mosquittopp.lib&#10;simpleble.lib"
             smallIcon="nVz6Li" bigIcon="nVz6Li" extraCompilerFlags="/bigobj">
       <CONFIGURATIONS>

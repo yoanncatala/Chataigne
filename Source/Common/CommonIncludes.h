@@ -20,9 +20,9 @@
 #include "simpleble/SimpleBLE.h"
 using namespace SimpleBLE;
 
-#include "BLE/BLEDevice.h"
-#include "BLE/BLEManager.h"
-#include "BLE/BLEDeviceParameter.h"
+//#include "BLE/BLEDevice.h"
+//#include "BLE/BLEManager.h"
+//#include "BLE/BLEDeviceParameter.h"
 
 #endif
 

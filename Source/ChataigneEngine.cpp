@@ -47,7 +47,7 @@ ChataigneEngine::ChataigneEngine() :
 
 	MIDIManager::getInstance(); //Trigger constructor, declare settings
 #if BLE_SUPPORT
-	BLEManager::getInstance(); //should be here ?
+	//BLEManager::getInstance(); //should be here ?
 #endif
 	CommunityModuleManager::getInstance(); //Trigger constructor, declare settings
 
@@ -97,7 +97,7 @@ ChataigneEngine::~ChataigneEngine()
 	MIDIManager::deleteInstance();
 	DMXManager::deleteInstance();
 #if BLE_SUPPORT
-	BLEManager::deleteInstance();
+	//BLEManager::deleteInstance();
 #endif
 	SerialManager::deleteInstance();
 	WiimoteManager::deleteInstance();
