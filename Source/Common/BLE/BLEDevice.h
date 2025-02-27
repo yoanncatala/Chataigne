@@ -40,6 +40,12 @@ public:
 	void removeBLEListener(BLEThreadListener* listener) { serialThreadListeners.remove(listener); }
 };
 
+class CharacteristicInfo {
+public:
+	SimpleBLE::BluetoothUUID service_uuid;
+	SimpleBLE::BluetoothUUID characteristic_uuid;
+	String niceName = characteristic_uuid;
+};
 
 class BLEDevice :
 	public BLEReadThread::BLEThreadListener
@@ -47,9 +53,7 @@ class BLEDevice :
 public:
 	BLEReadThread thread;
 
-	enum DeviceMode { LINES = 0, DIRECT = 1, DATA255 = 2, RAW = 3, JSON = 4, COBS = 5 };
-
-	BLEDevice(Peripheral& peripheral, DeviceMode mode = LINES);
+	BLEDevice(Peripheral& peripheral);
 
 	virtual ~BLEDevice();
 
@@ -59,25 +63,20 @@ public:
 	String id;
 	String description;
 
-	DeviceMode mode;
-
 	SpinLock peripheralLock;
 
-	void setMode(DeviceMode mode);
-
 	void setPeripheral(Peripheral& p);
+
+	void notifyCharacteristic(CharacteristicInfo characteristicInfo);
 
 	void open();
 	void close();
 
+	//void disconnect();
+
 	bool isOpen();
 
-	//write functions
-	int writeString(String message, String serviceUUID, String characteristics);
-	int writeBytes(Array<uint8_t> data, String serviceUUID, String characteristics);
-
-	virtual void dataReceived(const var& data) override;
-
+	void dataReceived(const var& data, CharacteristicInfo characteristicInfo);
 
 	class BLEDeviceListener
 	{
@@ -88,7 +87,10 @@ public:
 		virtual void deviceOpened(BLEDevice*) {};
 		virtual void deviceClosed(BLEDevice*) {};
 		virtual void deviceRemoved(BLEDevice* p) {};
-		virtual void bleDataReceived(const var&) {};
+		virtual void bleDataReceived(const var&, CharacteristicInfo characteristicInfo) {};
+		virtual void bleDeviceConnected() {};
+		virtual void bleDeviceDisconnected() {};
+		
 	};
 
 	ListenerList<BLEDeviceListener> listeners;

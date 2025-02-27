@@ -33,7 +33,7 @@
 #include "OSHelpers/KeyboardMouseHooker.cpp"
 
 #if BLE_SUPPORT
-//#include "BLE/BLEDevice.cpp"
-//#include "BLE/BLEManager.cpp"
-//#include "BLE/BLEDeviceParameter.cpp"
+#include "BLE/BLEDevice.cpp"
+#include "BLE/BLEManager.cpp"
+#include "BLE/BLEDeviceParameter.cpp"
 #endif

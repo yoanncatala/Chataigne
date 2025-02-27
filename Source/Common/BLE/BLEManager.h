@@ -24,9 +24,7 @@ public:
 	BLEManager();
 	~BLEManager();
 
-
 	OwnedArray<BLEDevice> devices;
-
 
 	std::optional<Adapter> adapter;
 	
@@ -40,8 +38,6 @@ public:
 	void removeDevice(BLEDevice* p);
 
 	void run() override;
-
-
 
 	class BLEManagerListener
 	{

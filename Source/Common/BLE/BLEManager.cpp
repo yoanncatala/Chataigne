@@ -17,7 +17,7 @@
 juce_ImplementSingleton(BLEManager);
 
 BLEManager::BLEManager() :
-	Thread("BLE")
+	Thread("BLE Manager")
 {
 	startThread();
 }
@@ -29,7 +29,7 @@ BLEManager::~BLEManager()
 void BLEManager::setup()
 {
 	if (!Adapter::bluetooth_enabled()) {
-		LOG("Bluetooth is not enabled!");
+		NLOG("BLEManager", "Bluetooth is not enabled!");
 		return;
 	}
 
@@ -39,7 +39,7 @@ void BLEManager::setup()
 
 		if (adapters.size() > 1)
 		{
-			NLOG("BLE", "Multiple Bluetooth adapters found, you can set the one you want to use in preferences");
+			NLOG("BLEManager", "Multiple Bluetooth adapters found, you can set the one you want to use in preferences");
 			for (auto& a : adapters)
 			{
 				LOG(" > " << a.identifier() << " [" << a.address() << "]");
@@ -47,12 +47,60 @@ void BLEManager::setup()
 		}
 
 		adapter = adapters.at(0);
-		NLOG("BLE", "Using adapter " << adapter->identifier() << "[" << adapter->address() << "]");
+		adapter->set_callback_on_scan_found([&](SimpleBLE::Peripheral peripheral) {
+			////NLOG("BLEManager", "Found device " << peripheral.identifier() << "[" << adapter->address() << "]");
+			//if (String(peripheral.identifier()).isEmpty()) {
+			//	//NLOG("BLEManager", "No identifier, ignoring device ...");
+			//	return;
+			//}
+			//if (!peripheral.is_connected() && !peripheral.is_connectable()) 
+			//{
+			//	//NLOG("BLEManager", "Not connectable, ignoring device ...");
+			//	return;
+			//}
+			//NLOG("BLEManager", "Found device " << peripheral.identifier() << "[" << adapter->address() << "]");
+			//if (BLEDevice* d = getDevice(peripheral))
+			//{
+			//	d->setPeripheral(peripheral);
+			//	NLOG("BLEManager", "Already existing, ignoring device ...");
+			//	return;
+			//}
+			//addDevice(peripheral);
+		});
+		adapter->set_callback_on_scan_start([]() { NLOG("BLEManager", "Scan started."); });
+		adapter->set_callback_on_scan_stop([&]() { 
+			//Array<BLEDevice*> devicesToRemove;
+			//for (auto& d : devices)
+			//{
+			//	bool found = false;
+			//	for (auto& s : adapter->scan_get_results())
+			//	{
+			//		String newID = s.address();
+			//		if (d->id == newID)
+			//		{
+			//			found = true;
+			//			break;
+			//		}
+			//	}
+			//	if (!found)
+			//	{
+			//		//create one so peripherals can delete the original
+			//		devicesToRemove.add(d);
+			//	}
+			//}
+
+			////check removed devices
+			//for (auto& d : devicesToRemove) removeDevice(d);
+			NLOG("BLEManager", "Scan stopped.");
+			});
+		
+		NLOG("BLEManager", "Using adapter " << adapter->identifier() << "[" << adapter->address() << "]");
+
 		return;
 	}
 
 	if (adapters.empty()) {
-		NLOGWARNING("BLE", "No adapter was found.");
+		NLOGWARNING("BLEManager", "No adapter was found.");
 		return;
 	}
 }
@@ -61,7 +109,7 @@ void BLEManager::setup()
 void BLEManager::updateDeviceList()
 {
 	adapter->scan_for(5000);
-
+	
 	std::vector<SimpleBLE::Peripheral> scanResult = adapter->scan_get_results();
 
 	
@@ -102,7 +150,7 @@ void BLEManager::updateDeviceList()
 
 	//check removed devices
 	for (auto& d : devicesToRemove) removeDevice(d);
-
+	
 }
 
 BLEDevice* BLEManager::getDevice(Peripheral& p)
@@ -123,7 +171,7 @@ void BLEManager::addDevice(Peripheral& p)
 	BLEDevice* d = new BLEDevice(p);
 	devices.add(d);
 
-	NLOG("BLEManager", "Device Added : \n" + d->description);
+	NLOG("BLEManager", "Device Added : " + d->description);
 	listeners.call(&BLEManagerListener::bleDeviceAdded, d);
 }
 
@@ -133,7 +181,7 @@ void BLEManager::removeDevice(BLEDevice* device)
 
 	device->close();
 
-	NLOG("BLEManager", "Device Removed : \n" + device->description);
+	NLOG("BLEManager", "Device Removed : " + device->description);
 	listeners.call(&BLEManagerListener::bleDeviceRemoved, device);
 
 	devices.removeObject(device, true);
@@ -144,10 +192,14 @@ void BLEManager::run()
 	setup();
 
 	if (!adapter.has_value()) return;
-
+	static int count = 0;
 	while (!threadShouldExit())
 	{
-		updateDeviceList();
+		//adapter->scan_for(5000);
+		if(count <1){
+			updateDeviceList();
+			count++;
+		}
 		wait(3000);
 	}
 }
