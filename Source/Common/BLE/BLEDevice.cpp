@@ -74,13 +74,11 @@ void BLEDevice::setPeripheral(Peripheral& p)
 
 void BLEDevice::open()
 {
-	NLOG("BLEDevice::open", "Trying to open device");
 	peripheral.connect();
 }
 
 void BLEDevice::close()
 {
-	NLOG("BLEDevice::close", "Trying to close device");
 	try
 	{
 		peripheral.disconnect();
@@ -102,8 +100,9 @@ bool BLEDevice::isOpen() {
 	return peripheral.is_connected();
 }
 
-void BLEDevice::dataReceived(const var& data, CharacteristicInfo characteristicInfo) {
-	listeners.call(&BLEDeviceListener::bleDataReceived, data,characteristicInfo);
+void BLEDevice::dataReceived(const var& data) {
+	listeners.call(&BLEDeviceListener::bleDataReceived,data);
+
 }
 
 void BLEDevice::addBLEDeviceListener(BLEDeviceListener* newListener) { listeners.add(newListener); }
@@ -123,12 +122,46 @@ BLEReadThread::~BLEReadThread()
 }
 
 
+ 
+void BLEDevice::readCharacteristic(CharacteristicInfo characteristicInfo)
+{
+	try {
+		auto readResult = peripheral.read(characteristicInfo.service_uuid, characteristicInfo.characteristic_uuid);
+		auto resultObject = new juce::DynamicObject();
+		resultObject->setProperty("service_uuid", (juce::var)characteristicInfo.service_uuid);
+		resultObject->setProperty("char_uuid", (juce::var)characteristicInfo.characteristic_uuid);
+		resultObject->setProperty("data", juce::String(std::to_string(byteArrayToIntBE(readResult))));
+		dataReceived(resultObject);
+		//dataReceived((juce::var)readResult);
+	}
+	catch (std::exception e)
+	{
+		NLOGWARNING("BLEDevice", "Error reading characteristic : " << characteristicInfo.characteristic_uuid);
+	}
+	
+}
+
 void BLEDevice::notifyCharacteristic(CharacteristicInfo characteristicInfo)
 {
 	peripheral.notify(characteristicInfo.service_uuid, characteristicInfo.characteristic_uuid, [&](SimpleBLE::ByteArray bytes) {
-	//NLOG("BLEDEVICE", "Received data : " + bytes + " as int -> " + std::to_string(byteArrayToIntBE(bytes)).c_str());
-	dataReceived((juce::var)byteArrayToIntBE(bytes),characteristicInfo);
+		juce::DynamicObject::Ptr resultObject = new juce::DynamicObject();
+		resultObject->setProperty("service_uuid", juce::String(static_cast<std::string>( characteristicInfo.service_uuid)));
+		resultObject->setProperty("char_uuid", juce::String(static_cast<std::string>(characteristicInfo.characteristic_uuid)));
+		resultObject->setProperty("data", juce::String(std::to_string(byteArrayToIntBE(bytes))));
+		juce::var objectVar = resultObject;
+		dataReceived(objectVar);
 	});
+}
+
+void BLEDevice::writeCharacteristic(CharacteristicInfo characteristicInfo, SimpleBLE::ByteArray bytes)
+{
+	try {
+		peripheral.write_command(characteristicInfo.service_uuid, characteristicInfo.characteristic_uuid,bytes);
+	}
+	catch (std::exception e)
+	{
+		NLOGWARNING("BLEDevice", "Error reading characteristic : " << characteristicInfo.characteristic_uuid);
+	}
 }
 
 void BLEReadThread::run() {

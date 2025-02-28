@@ -13,8 +13,6 @@
 
 #if BLE_SUPPORT
 
-//BLEValueComparator BLEModule::bleValueComparator;
-
 BLEModule::BLEModule(const String& name) :
 	Module(name),
 	device(nullptr)
@@ -177,10 +175,12 @@ void BLEModule::onControllableFeedbackUpdate(ControllableContainer* cc, Controll
 			NLOG("BLEModule", "Characteristic uuid : " << characteristicTrigger.characteristic_info.characteristic_uuid);
 			switch (characteristicTrigger.characteristic_capability) {
 			case CharacteristicTrigger::CharacteristicCapability::Read: {
-
+				device->readCharacteristic(characteristicTrigger.characteristic_info);
 				break;
 			}
 			case CharacteristicTrigger::CharacteristicCapability::Write: {
+				auto bytes = SimpleBLE::ByteArray("Test data");
+				device->writeCharacteristic(characteristicTrigger.characteristic_info, bytes);
 				break;
 			}
 			case CharacteristicTrigger::CharacteristicCapability::Notify: {
@@ -244,9 +244,17 @@ void BLEModule::bleDeviceRemoved(BLEDevice* d)
 	if (device != nullptr && device == d) setCurrentDevice(nullptr);
 }
 
-void BLEModule::bleDataReceived(const var& data, CharacteristicInfo characteristicInfo)
+void BLEModule::bleDataReceived(const var& data)
 {
-	ControllableContainer* cParentContainer = &valuesCC;
+	auto& service_uuid = data.getProperty("service_uuid","").toString();
+	auto& char_uuid = data.getProperty("char_uuid","").toString();
+	auto& receivedData = data.getProperty("data","").toString();
+
+	NLOG("BLEModule", "Service uuid : " << service_uuid);
+	NLOG("BLEModule", "Characteristic uuid : " << char_uuid);
+	NLOG("BLEModule", "Data : " << receivedData);
+
+	/*ControllableContainer* cParentContainer = &valuesCC;
 
 	ControllableContainer* characteristicContainer = valuesCC.getControllableContainerByName(serviceUUID->value, true);
 	if (characteristicContainer == nullptr)
@@ -272,7 +280,7 @@ void BLEModule::bleDataReceived(const var& data, CharacteristicInfo characterist
 	else
 	{
 		p->setValue(data);
-	}
+	}*/
 }
 void BLEModule::bleDeviceConnected()
 {

@@ -67,7 +67,9 @@ public:
 
 	void setPeripheral(Peripheral& p);
 
+	void readCharacteristic(CharacteristicInfo characteristicInfo);
 	void notifyCharacteristic(CharacteristicInfo characteristicInfo);
+	void writeCharacteristic(CharacteristicInfo characteristicInfo, SimpleBLE::ByteArray bytes);
 
 	void open();
 	void close();
@@ -76,7 +78,7 @@ public:
 
 	bool isOpen();
 
-	void dataReceived(const var& data, CharacteristicInfo characteristicInfo);
+	void dataReceived(const var& data);
 
 	class BLEDeviceListener
 	{
@@ -87,7 +89,7 @@ public:
 		virtual void deviceOpened(BLEDevice*) {};
 		virtual void deviceClosed(BLEDevice*) {};
 		virtual void deviceRemoved(BLEDevice* p) {};
-		virtual void bleDataReceived(const var&, CharacteristicInfo characteristicInfo) {};
+		virtual void bleDataReceived(const var&) {};
 		virtual void bleDeviceConnected() {};
 		virtual void bleDeviceDisconnected() {};
 		

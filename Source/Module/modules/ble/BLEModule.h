@@ -38,7 +38,6 @@ public:
 
 	
 	class CharacteristicTrigger {
-		
 	public:
 		enum CharacteristicCapability {
 			Write,
@@ -66,7 +65,7 @@ public:
 	virtual void deviceOpened(BLEDevice*) override;
 	virtual void deviceClosed(BLEDevice*) override;
 	virtual void deviceRemoved(BLEDevice*) override;
-	virtual void bleDataReceived(const var& data, CharacteristicInfo characteristicInfo) override;
+	virtual void bleDataReceived(const var& data) override;
 	virtual void bleDeviceConnected() override;
 	virtual void bleDeviceDisconnected() override;
 
